@@ -1,15 +1,9 @@
 package com.ft;
-
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
-import java.io.IOException;
+import com.ft.view.MainView;
 
 /**
  * JavaFX App
@@ -22,11 +16,12 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Group root = new Group();
-        Scene scene = new Scene(root,Color.BLACK);
-
+        MainView mainView = new MainView();
+        Scene scene = new Scene(mainView, 1200 , 800);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         Image icon = new Image("icon.png");
-
+        primaryStage.setFullScreen(true);
+        primaryStage.setResizable(false);
         primaryStage.getIcons().add(icon);
         primaryStage.setTitle("FlowRouth");
         primaryStage.setScene(scene);

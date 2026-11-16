@@ -1,2 +1,3 @@
-com\ft\App.class
 module-info.class
+com\ft\App.class
+com\ft\view\MainView.class
