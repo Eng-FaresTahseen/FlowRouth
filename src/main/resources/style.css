@@ -18,3 +18,89 @@
 .button:hover {
     -fx-background-color: #38BDF8;
 }
+
+.routh-root {
+    -fx-background-color: #f6f7f9;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+.hint {
+    -fx-text-fill: #6b7280;
+}
+
+.poly {
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 15px;
+    -fx-text-fill: #111827;
+}
+
+.error {
+    -fx-text-fill: #b91c1c;
+    -fx-font-weight: bold;
+}
+
+.text-field, .combo-box {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d1d5db;
+    -fx-background-color: white;
+    -fx-padding: 6 10 6 10;
+}
+
+.badge {
+    -fx-padding: 5 12 5 12;
+    -fx-background-radius: 14;
+    -fx-font-weight: bold;
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #374151;
+}
+
+.badge.ok  { -fx-background-color: #dcfce7; -fx-text-fill: #166534; }
+.badge.bad { -fx-background-color: #fee2e2; -fx-text-fill: #991b1b; }
+.badge.err { -fx-background-color: #fef3c7; -fx-text-fill: #92400e; }
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f3f4f6;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.table-row-cell {
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 13px;
+}
+
+.table-cell {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-cell.neg {
+    -fx-text-fill: #b91c1c;
+    -fx-font-weight: bold;
+}
+
+.note {
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 6;
+    -fx-background-color: #e5e7eb;
+}
+
+.note.ok  { -fx-background-color: #dcfce7; -fx-text-fill: #166534; }
+.note.bad { -fx-background-color: #fee2e2; -fx-text-fill: #991b1b; }
