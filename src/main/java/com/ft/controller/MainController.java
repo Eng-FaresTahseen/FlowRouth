@@ -17,6 +17,7 @@ public class MainController {
         this.routhView = routhView;
         homeView.getSignalFlowButton().setOnAction(e -> showSignalFlowScreen());
         homeView.getRouthCriterionButton().setOnAction(e -> showRouthCriterionScreen());
+        routhView.getBackButton().setOnAction(e -> showHomeScreen());
     }
 
     public void showHomeScreen() {

@@ -104,3 +104,20 @@
 
 .note.ok  { -fx-background-color: #dcfce7; -fx-text-fill: #166534; }
 .note.bad { -fx-background-color: #fee2e2; -fx-text-fill: #991b1b; }
+
+.routh-root .button.secondary {
+    -fx-min-width: 90px;
+    -fx-pref-width: 90px;
+    -fx-max-width: 90px;
+    -fx-background-color: transparent;
+    -fx-border-color: #0EA5E9;
+    -fx-border-radius: 10px;
+    -fx-text-fill: #0EA5E9;
+    -fx-font-size: 13px;
+    -fx-padding: 6px 12px;
+}
+
+.routh-root .button.secondary:hover {
+    -fx-background-color: #e0f2fe;
+}
+
