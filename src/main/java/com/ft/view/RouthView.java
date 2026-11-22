@@ -43,6 +43,7 @@ public class RouthView extends BorderPane {
     private final TextField input = new TextField("1 2 3 4");
     private final ComboBox<String> examples = new ComboBox<>();
     private final Button calcButton = new Button("Calculate");
+    private final Button backButton = new Button("Home");
     private final Label polyLabel = new Label();
     private final Label errorLabel = new Label();
     private final Label routhBadge = newBadge();
@@ -87,6 +88,10 @@ public class RouthView extends BorderPane {
     public void setOnCalculate(Runnable action) {
         this.onCalculate = action;
     }
+    
+    public Button getBackButton() {
+        return backButton;
+    }
 
     public void showError(String message) {
         errorLabel.setText(message);
@@ -117,6 +122,10 @@ public class RouthView extends BorderPane {
         Label hint = new Label(
                 "Enter coefficients from highest power to lowest, separated by spaces or commas.");
         hint.getStyleClass().add("hint");
+        
+        backButton.getStyleClass().add("secondary");
+        HBox header = new HBox(12, backButton, title);
+        header.setAlignment(Pos.CENTER_LEFT);
 
         input.setPromptText("e.g. 1 2 3 4  →  s³ + 2s² + 3s + 4");
         HBox.setHgrow(input, Priority.ALWAYS);
@@ -140,7 +149,7 @@ public class RouthView extends BorderPane {
         HBox badges = new HBox(8, routhBadge, numericBadge);
         badges.setAlignment(Pos.CENTER_LEFT);
 
-        VBox top = new VBox(8, title, hint, inputBar, polyLabel, errorLabel, badges);
+        VBox top = new VBox(8, header, hint, inputBar, polyLabel, errorLabel, badges);
         top.setPadding(new Insets(0, 0, 12, 0));
         return top;
     }
