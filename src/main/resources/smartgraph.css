@@ -1,0 +1,62 @@
+.graph {
+    -fx-background-color: #ffffff;
+}
+
+.vertex {
+    -fx-stroke-width: 2.2;
+    -fx-stroke: #1e40af;
+    -fx-stroke-type: inside;
+    -fx-fill: #dbeafe;
+}
+
+.vertex:hover {
+    -fx-stroke-width: 3;
+    -fx-fill: #bfdbfe;
+}
+
+.vertex-source {
+    -fx-stroke-width: 2.5;
+    -fx-stroke: #15803d;
+    -fx-stroke-type: inside;
+    -fx-fill: #dcfce7;
+}
+
+.vertex-target {
+    -fx-stroke-width: 2.5;
+    -fx-stroke: #b45309;
+    -fx-stroke-type: inside;
+    -fx-fill: #fef3c7;
+}
+
+.vertex-label {
+    -fx-font: bold 11pt "sans-serif";
+    -fx-fill: #0f172a;
+}
+
+.edge {
+    -fx-stroke-width: 1.8;
+    -fx-stroke: #334155;
+    -fx-stroke-dash-array: none;
+    -fx-fill: transparent;
+    -fx-stroke-line-cap: round;
+    -fx-opacity: 0.9;
+}
+
+.edge-feedback {
+    -fx-stroke-width: 1.8;
+    -fx-stroke: #dc2626;
+    -fx-fill: transparent;
+    -fx-opacity: 0.9;
+}
+
+.edge-label {
+    -fx-font: bold 10pt "Consolas";
+    -fx-fill: #0f172a;
+}
+
+.arrow {
+    -fx-stroke-width: 1.8;
+    -fx-stroke: #334155;
+    -fx-fill: #334155;
+    -fx-opacity: 0.9;
+}

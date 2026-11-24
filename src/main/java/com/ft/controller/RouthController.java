@@ -14,6 +14,7 @@ public class RouthController {
     public RouthController(RouthView view) {
         this.view = view;
         this.view.setOnCalculate(this::onCalculate);
+        onCalculate();
     }
 
     private void onCalculate() {

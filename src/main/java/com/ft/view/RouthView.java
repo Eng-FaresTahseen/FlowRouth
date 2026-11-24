@@ -1,5 +1,6 @@
 package com.ft.view;
 
+import atlantafx.base.theme.Styles;
 import com.ft.model.routh.RouthResult;
 import com.ft.model.routh.RouthStep;
 import com.ft.model.routh.numerical.NumericalResults;
@@ -19,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.apache.commons.numbers.complex.Complex;
 
@@ -30,39 +32,35 @@ import java.util.Locale;
 
 public class RouthView extends BorderPane {
 
-    /* Outcome of comparing the two methods */
     public enum Verdict { AGREE, DISAGREE, ROUTH_FAILED, NUMERIC_FAILED, BOTH_FAILED }
 
     private static final double EPS = 1e-10;
-    private static final String DASH = "—";
+    private static final String DASH = "-";
 
     private final DecimalFormat df =
             new DecimalFormat("0.####", DecimalFormatSymbols.getInstance(Locale.US));
 
-    // Input area
     private final TextField input = new TextField("1 2 3 4");
     private final ComboBox<String> examples = new ComboBox<>();
     private final Button calcButton = new Button("Calculate");
     private final Button backButton = new Button("Home");
     private final Label polyLabel = new Label();
     private final Label errorLabel = new Label();
-    private final Label routhBadge = newBadge();
-    private final Label numericBadge = newBadge();
+    private final Label routhBadge = newStatusBox();
+    private final Label numericBadge = newStatusBox();
 
-    // Result tables
     private final TableView<String[]> routhTable = new TableView<>();
     private final TableView<String[]> stepsTable = new TableView<>();
     private final TableView<String[]> rootsTable = new TableView<>();
     private final TableView<String[]> compareTable = new TableView<>();
     private final Label compareNote = new Label();
 
-    // s-plane plot
     private final RootPlotPane rootPlot = new RootPlotPane();
 
-    private Runnable onCalculate = () -> { };
+    private Runnable onCalculate = () -> {};
 
     public RouthView() {
-        getStyleClass().add("routh-root");
+        getStyleClass().add(Styles.BG_SUBTLE);
         setPadding(new Insets(16));
 
         setTop(buildTop());
@@ -73,13 +71,11 @@ public class RouthView extends BorderPane {
         examples.setOnAction(e -> {
             String v = examples.getValue();
             if (v != null) {
-                input.setText(v.split("\\s+→\\s+")[0]);
+                input.setText(v.split("\\s+->\\s+")[0]);
                 onCalculate.run();
             }
         });
     }
-
-    //  API used by the controller
 
     public String getInputText() {
         return input.getText();
@@ -88,7 +84,7 @@ public class RouthView extends BorderPane {
     public void setOnCalculate(Runnable action) {
         this.onCalculate = action;
     }
-    
+
     public Button getBackButton() {
         return backButton;
     }
@@ -103,7 +99,7 @@ public class RouthView extends BorderPane {
                             Verdict verdict) {
 
         errorLabel.setText("");
-        polyLabel.setText("P(s) = " + polynomialToString(coeffs));
+        polyLabel.setText("P(s) = " + polynomialToString(coeffs) + " = 0");
 
         int n = coeffs.length;
         showRouth(routh, routhError, n);
@@ -113,44 +109,41 @@ public class RouthView extends BorderPane {
         showVerdict(verdict, routhError, numericError);
     }
 
-    //  Layout
-
     private VBox buildTop() {
-        Label title = new Label("Routh–Hurwitz Stability");
-        title.getStyleClass().add("title");
+        Label title = new Label("Routh-Hurwitz Stability Criterion");
+        title.getStyleClass().add(Styles.TITLE_3);
 
-        Label hint = new Label(
-                "Enter coefficients from highest power to lowest, separated by spaces or commas.");
-        hint.getStyleClass().add("hint");
-        
-        backButton.getStyleClass().add("secondary");
+        backButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
         HBox header = new HBox(12, backButton, title);
         header.setAlignment(Pos.CENTER_LEFT);
 
-        input.setPromptText("e.g. 1 2 3 4  →  s³ + 2s² + 3s + 4");
+        Label coeffLbl = new Label("Coefficients:");
+        coeffLbl.setMinWidth(Region.USE_PREF_SIZE);
+
+        input.setPromptText("e.g. 1 2 3 4  ->  s^3 + 2s^2 + 3s + 4");
         HBox.setHgrow(input, Priority.ALWAYS);
 
-        examples.setPromptText("Examples");
+        examples.setPromptText("Load Example");
         examples.getItems().addAll(
-                "1 2 3 4 → stable",
-                "1 2 3 6 → marginal (imaginary roots)",
-                "1 1 2 8 → unstable",
-                "1 5 10 10 5 1 → stable (5th order)");
+                "1 2 3 4 -> Stable (3rd order)",
+                "1 3 5 4 2 -> Stable (4th order)",
+                "1 1 10 72 152 240 -> Unstable (5th order)",
+                "1 1 2 8 -> Unstable (3rd order)"
+        );
 
-        calcButton.getStyleClass().add("primary");
+        calcButton.getStyleClass().add(Styles.ACCENT);
 
-        HBox inputBar = new HBox(8, input, examples, calcButton);
+        HBox inputBar = new HBox(8, coeffLbl, input, examples, calcButton);
         inputBar.setAlignment(Pos.CENTER_LEFT);
 
-        polyLabel.getStyleClass().add("poly");
-        errorLabel.getStyleClass().add("error");
-        errorLabel.setWrapText(true);
+        polyLabel.getStyleClass().add(Styles.TEXT_BOLD);
+        errorLabel.getStyleClass().addAll(Styles.DANGER, Styles.TEXT_BOLD);
 
-        HBox badges = new HBox(8, routhBadge, numericBadge);
+        HBox badges = new HBox(10, routhBadge, numericBadge);
         badges.setAlignment(Pos.CENTER_LEFT);
 
-        VBox top = new VBox(8, header, hint, inputBar, polyLabel, errorLabel, badges);
-        top.setPadding(new Insets(0, 0, 12, 0));
+        VBox top = new VBox(8, header, inputBar, polyLabel, errorLabel, badges);
+        top.setPadding(new Insets(0, 0, 10, 0));
         return top;
     }
 
@@ -163,33 +156,30 @@ public class RouthView extends BorderPane {
                 new Tab("Calculation Steps", wrap(stepsTable, null)),
                 new Tab("Numerical Roots", wrap(rootsTable, null)),
                 new Tab("Root Plot", buildPlotTab()),
-                new Tab("Comparison", wrap(compareTable, compareNote)));
+                new Tab("Comparison", wrap(compareTable, compareNote))
+        );
 
         compareNote.setWrapText(true);
-        compareNote.getStyleClass().add("note");
         return tabs;
     }
 
     private VBox buildPlotTab() {
-        Label legend = new Label(
-                "×  green: left half-plane (stable)   ·   red: right half-plane (unstable)"
-                + "   ·   amber: on the imaginary axis (marginal).   Hover a root to see its value.");
-        legend.getStyleClass().add("hint");
-        legend.setWrapText(true);
+        Label legend = new Label("Green: Left Half-Plane (Stable)   |   Red: Right Half-Plane (Unstable)   |   Amber: Imaginary Axis");
+        legend.getStyleClass().add(Styles.TEXT_MUTED);
 
         VBox.setVgrow(rootPlot, Priority.ALWAYS);
-
         VBox box = new VBox(8, rootPlot, legend);
-        box.setPadding(new Insets(12, 0, 0, 0));
+        box.setPadding(new Insets(8, 0, 0, 0));
         return box;
     }
 
     private VBox wrap(TableView<String[]> table, Label note) {
         table.setPlaceholder(new Label("No data"));
+        table.getStyleClass().addAll(Styles.BORDERED, Styles.STRIPED, Styles.DENSE);
         VBox.setVgrow(table, Priority.ALWAYS);
 
         VBox box = new VBox(8);
-        box.setPadding(new Insets(12, 0, 0, 0));
+        box.setPadding(new Insets(8, 0, 0, 0));
         box.getChildren().add(table);
         if (note != null) {
             box.getChildren().add(note);
@@ -197,13 +187,11 @@ public class RouthView extends BorderPane {
         return box;
     }
 
-    //  Section renderers
-
     private void showRouth(RouthResult r, String error, int n) {
         if (r == null) {
             routhTable.getColumns().clear();
             routhTable.getItems().clear();
-            setBadge(routhBadge, "Routh: " + error, "err");
+            setStatusBox(routhBadge, "Routh: " + error, false);
             return;
         }
 
@@ -227,7 +215,6 @@ public class RouthView extends BorderPane {
         }
         fill(routhTable, headers, rows);
 
-        // highlight negative first-column cells
         @SuppressWarnings("unchecked")
         TableColumn<String[], String> firstCol =
                 (TableColumn<String[], String>) routhTable.getColumns().get(1);
@@ -244,14 +231,14 @@ public class RouthView extends BorderPane {
         });
 
         int changes = r.getRightHalfPlaneRoots();
-        setBadge(routhBadge,
+        setStatusBox(routhBadge,
                 "Routh: " + (r.isStable() ? "Stable" : "Unstable")
-                        + "  (" + changes + " sign change" + (changes == 1 ? "" : "s") + ")",
-                r.isStable() ? "ok" : "bad");
+                        + " (" + changes + " sign change" + (changes == 1 ? "" : "s") + ")",
+                r.isStable());
     }
 
     private void showSteps(RouthResult r, int n) {
-        List<String> headers = List.of("Cell", "Formula  (a·b − c·d) / a", "Result");
+        List<String> headers = List.of("Cell", "Formula  (a*b - c*d) / a", "Result");
         List<String[]> rows = new ArrayList<>();
 
         if (r != null) {
@@ -276,7 +263,7 @@ public class RouthView extends BorderPane {
         if (r == null) {
             fill(rootsTable, headers, rows);
             rootPlot.clear();
-            setBadge(numericBadge, "Numerical: unavailable", "err");
+            setStatusBox(numericBadge, "Numerical: unavailable", false);
             return;
         }
 
@@ -290,12 +277,12 @@ public class RouthView extends BorderPane {
         fill(rootsTable, headers, rows);
         rootPlot.setRoots(roots);
 
-        setBadge(numericBadge,
+        setStatusBox(numericBadge,
                 "Numerical: " + (r.isStable() ? "Stable" : "Unstable")
-                        + "  (RHP " + r.getRightHalfPlaneCount()
-                        + " · LHP " + r.getLeftHalfPlaneCount()
-                        + " · Axis " + r.getImaginaryAxisCount() + ")",
-                r.isStable() ? "ok" : "bad");
+                        + " (RHP: " + r.getRightHalfPlaneCount()
+                        + ", LHP: " + r.getLeftHalfPlaneCount()
+                        + ", Axis: " + r.getImaginaryAxisCount() + ")",
+                r.isStable());
     }
 
     private void showComparison(RouthResult routh, NumericalResults num, int degree) {
@@ -327,41 +314,19 @@ public class RouthView extends BorderPane {
     }
 
     private void showVerdict(Verdict verdict, String routhError, String numericError) {
-        compareNote.getStyleClass().removeAll("ok", "bad");
-
         switch (verdict) {
-            case AGREE -> {
-                compareNote.setText("Both methods agree.");
-                compareNote.getStyleClass().add("ok");
-            }
-            case DISAGREE -> {
-                compareNote.setText("Methods disagree. Check for roots on the imaginary axis "
-                        + "or numerical tolerance (ε = 1e-10).");
-                compareNote.getStyleClass().add("bad");
-            }
-            case ROUTH_FAILED -> {
-                compareNote.setText("Routh could not finish: " + routhError
-                        + ".  The numerical result is the reference here.");
-                compareNote.getStyleClass().add("bad");
-            }
-            case NUMERIC_FAILED -> {
-                compareNote.setText("Numerical solver failed: " + numericError);
-                compareNote.getStyleClass().add("bad");
-            }
-            case BOTH_FAILED -> {
-                compareNote.setText("Both methods failed.  Routh: " + routhError
-                        + "   |   Numerical: " + numericError);
-                compareNote.getStyleClass().add("bad");
-            }
+            case AGREE -> setStatusBox(compareNote, "Both methods agree.", true);
+            case DISAGREE -> setStatusBox(compareNote, "Methods disagree. Check imaginary axis roots or tolerance.", false);
+            case ROUTH_FAILED -> setStatusBox(compareNote, "Routh failed: " + routhError, false);
+            case NUMERIC_FAILED -> setStatusBox(compareNote, "Numerical failed: " + numericError, false);
+            case BOTH_FAILED -> setStatusBox(compareNote, "Both failed.", false);
         }
     }
-
-    //  Formatting helpers
 
     private static String[] row(String metric, String routh, String numeric) {
         String match = (routh.equals(DASH) || numeric.equals(DASH))
                 ? DASH
-                : (routh.equals(numeric) ? "✓" : "✗");
+                : (routh.equals(numeric) ? "Yes" : "No");
         return new String[]{metric, routh, numeric, match};
     }
 
@@ -375,7 +340,6 @@ public class RouthView extends BorderPane {
         return "Imaginary axis";
     }
 
-    /** Row i of the table corresponds to power s^(n-1-i). */
     private static String rowLabel(int i, int n) {
         return "s^" + (n - 1 - i);
     }
@@ -393,13 +357,13 @@ public class RouthView extends BorderPane {
             if (v == 0) continue;
             int power = n - 1 - i;
 
-            String sign = v < 0 ? "−" : "+";
+            String sign = v < 0 ? "-" : "+";
             double abs = Math.abs(v);
             String coef = (abs == 1 && power != 0) ? "" : df.format(abs);
             String term = coef + (power == 0 ? "" : power == 1 ? "s" : "s^" + power);
 
             if (sb.length() == 0) {
-                sb.append(v < 0 ? "−" : "").append(term);
+                sb.append(v < 0 ? "-" : "").append(term);
             } else {
                 sb.append(" ").append(sign).append(" ").append(term);
             }
@@ -407,17 +371,12 @@ public class RouthView extends BorderPane {
         return sb.length() == 0 ? "0" : sb.toString();
     }
 
-    /** Equal column widths. */
     private void fill(TableView<String[]> table, List<String> headers, List<String[]> rows) {
         double[] weights = new double[headers.size()];
         java.util.Arrays.fill(weights, 1.0);
         fill(table, headers, rows, weights);
     }
 
-    /**
-     * Column widths are bound to the table width using the given weights,
-     * so they re-spread automatically every time the columns are rebuilt.
-     */
     private void fill(TableView<String[]> table, List<String> headers,
                       List<String[]> rows, double[] weights) {
 
@@ -441,15 +400,24 @@ public class RouthView extends BorderPane {
         table.setItems(FXCollections.observableArrayList(rows));
     }
 
-    private static Label newBadge() {
+    private static Label newStatusBox() {
         Label l = new Label();
-        l.getStyleClass().add("badge");
+        l.getStyleClass().addAll("status-box", Styles.TEXT_BOLD);
         return l;
     }
 
-    private static void setBadge(Label l, String text, String state) {
+    private static void setStatusBox(Label l, String text, boolean ok) {
         l.setText(text);
-        l.getStyleClass().removeAll("ok", "bad", "err");
-        l.getStyleClass().add(state);
+        l.getStyleClass().removeAll(
+                "status-box",
+                Styles.BG_SUCCESS_SUBTLE, Styles.SUCCESS,
+                Styles.BG_DANGER_SUBTLE, Styles.DANGER
+        );
+        l.getStyleClass().add("status-box");
+        if (ok) {
+            l.getStyleClass().addAll(Styles.BG_SUCCESS_SUBTLE, Styles.SUCCESS);
+        } else {
+            l.getStyleClass().addAll(Styles.BG_DANGER_SUBTLE, Styles.DANGER);
+        }
     }
 }
