@@ -1,10 +1,11 @@
 package com.ft.view;
+
+import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-
+import javafx.scene.layout.HBox;
 
 public class HomeView extends BorderPane {
 
@@ -12,26 +13,34 @@ public class HomeView extends BorderPane {
     private final Button routhCriterionButton;
 
     public HomeView() {
-    
+        getStyleClass().add(Styles.BG_SUBTLE);
 
-        ImageView imageView = new ImageView("logo-horizontal.png");
-        imageView.setFitWidth(400);
-        imageView.setPreserveRatio(true);
+        ImageView flowIcon = new ImageView("data-flow.png");
+        flowIcon.setFitWidth(160);
+        flowIcon.setPreserveRatio(true);
+        flowIcon.setMouseTransparent(true);
 
-        this.signalFlowButton = new Button("Signal Flow");
-        this.routhCriterionButton = new Button("Routh Criterion");
+        ImageView routhIcon = new ImageView("coordinate.png");
+        routhIcon.setFitWidth(160);
+        routhIcon.setPreserveRatio(true);
+        routhIcon.setMouseTransparent(true);
 
-        VBox homeContent = new VBox(30);
+        this.signalFlowButton = new Button();
+        this.signalFlowButton.setGraphic(flowIcon);
+        this.signalFlowButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+        this.signalFlowButton.setPrefSize(240, 240);
+        this.signalFlowButton.setPickOnBounds(true);
 
-        homeContent.setAlignment(Pos.CENTER);
+        this.routhCriterionButton = new Button();
+        this.routhCriterionButton.setGraphic(routhIcon);
+        this.routhCriterionButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+        this.routhCriterionButton.setPrefSize(240, 240);
+        this.routhCriterionButton.setPickOnBounds(true);
 
-        homeContent.getChildren().addAll(
-                imageView,
-                signalFlowButton,
-                routhCriterionButton
-        );
+        HBox box = new HBox(48, signalFlowButton, routhCriterionButton);
+        box.setAlignment(Pos.CENTER);
 
-        setCenter(homeContent);
+        setCenter(box);
     }
 
     public Button getSignalFlowButton() {
@@ -41,5 +50,4 @@ public class HomeView extends BorderPane {
     public Button getRouthCriterionButton() {
         return routhCriterionButton;
     }
-
 }

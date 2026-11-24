@@ -3,8 +3,6 @@ package com.ft.view;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -14,17 +12,13 @@ import org.apache.commons.numbers.complex.Complex;
 
 import java.util.Locale;
 
-/**
- * Draws the s-plane (Re / Im axes) with a grid and the roots of P(s) as "x" marks.
- */
 public class RootPlotPane extends Pane {
 
-    private static final double EPS = 1e-10;        // same tolerance as the calculators
-    private static final double FIT_PAD = 40;       // pixels kept free around the roots
-    private static final double MIN_SPAN = 2.0;     // smallest visible range (data units)
-    private static final double MARK = 7;           // half size of the "x" mark
-    private static final double HIT_RADIUS = 12;    // hover distance in pixels
-    private static final double LABEL_GAP = 12;     // distance between the axes and their labels
+    private static final double EPS = 1e-10;
+    private static final double FIT_PAD = 40;
+    private static final double MIN_SPAN = 2.0;
+    private static final double MARK = 7;
+    private static final double LABEL_GAP = 12;
 
     private static final Color GRID     = Color.web("#e5e7eb");
     private static final Color AXIS     = Color.web("#374151");
@@ -37,37 +31,20 @@ public class RootPlotPane extends Pane {
     private static final Color MARGINAL = Color.web("#d97706");
 
     private final Canvas canvas = new Canvas();
-    private final Label tip = new Label();        // small "bubble" drawn inside the pane
 
     private Complex[] roots = new Complex[0];
-    private Complex hovered;                      // root under the mouse (or null)
-
-    // current mapping data -> pixels (updated on every draw, also used by hover)
     private double originX;
     private double originY;
     private double scale = 1;
 
     public RootPlotPane() {
-        setMinSize(0, 0);              // lets the pane shrink again after growing
+        setMinSize(0, 0);
         setPrefSize(600, 400);
-
-        tip.setManaged(false);
-        tip.setMouseTransparent(true);
-        tip.setVisible(false);
-        tip.setStyle("-fx-background-color: #111827; -fx-text-fill: white; "
-                + "-fx-background-radius: 6; -fx-padding: 4 8 4 8; -fx-font-size: 12px;");
-        getChildren().addAll(canvas, tip);
-
-        canvas.setOnMouseMoved(this::onHover);
-        canvas.setOnMouseExited(e -> setHovered(null));
+        getChildren().add(canvas);
     }
-
-    //  API used by RouthView
 
     public void setRoots(Complex[] newRoots) {
         this.roots = newRoots == null ? new Complex[0] : newRoots.clone();
-        hovered = null;
-        tip.setVisible(false);
         draw();
     }
 
@@ -79,12 +56,8 @@ public class RootPlotPane extends Pane {
     protected void layoutChildren() {
         canvas.setWidth(getWidth());
         canvas.setHeight(getHeight());
-        hovered = null;
-        tip.setVisible(false);
         draw();
     }
-
-    //  Drawing
 
     private void draw() {
         double w = canvas.getWidth();
@@ -111,7 +84,6 @@ public class RootPlotPane extends Pane {
         g.strokeRect(0.5, 0.5, w - 1, h - 1);
     }
 
-    /** Chooses the scale / origin so every root (and the origin) is visible. */
     private void updateTransform(double w, double h) {
         double xmin = 0, xmax = 0, ymin = 0, ymax = 0;
         for (Complex r : roots) {
@@ -128,7 +100,6 @@ public class RootPlotPane extends Pane {
         double availH = Math.max(h - 2 * FIT_PAD, 1);
         scale = Math.min(availW / (bx[1] - bx[0]), availH / (by[1] - by[0]));
 
-        // center the bounding box of the roots in the canvas
         originX = w / 2 - (bx[0] + bx[1]) / 2 * scale;
         originY = h / 2 + (by[0] + by[1]) / 2 * scale;
     }
@@ -171,8 +142,8 @@ public class RootPlotPane extends Pane {
     private void drawAxes(GraphicsContext g, double w, double h) {
         g.setStroke(AXIS);
         g.setLineWidth(1.5);
-        g.strokeLine(0, snap(originY), w, snap(originY));   // real axis
-        g.strokeLine(snap(originX), 0, snap(originX), h);   // imaginary axis
+        g.strokeLine(0, snap(originY), w, snap(originY));
+        g.strokeLine(snap(originX), 0, snap(originX), h);
     }
 
     private void drawTickLabels(GraphicsContext g, double w, double h, double step) {
@@ -184,7 +155,6 @@ public class RootPlotPane extends Pane {
         double yHi = originY / scale;
         double yLo = (originY - h) / scale;
 
-        // real-axis labels (under the axis, kept inside the canvas)
         g.setTextAlign(TextAlignment.CENTER);
         g.setTextBaseline(VPos.TOP);
         double labelY = clamp(originY + LABEL_GAP, 2, h - 16);
@@ -193,7 +163,6 @@ public class RootPlotPane extends Pane {
             g.fillText(tick(k * step, step), originX + k * step * scale, labelY);
         }
 
-        // imaginary-axis labels (right of the axis, kept inside the canvas)
         g.setTextAlign(TextAlignment.LEFT);
         g.setTextBaseline(VPos.CENTER);
         double labelX = clamp(originX + LABEL_GAP, 2, w - 40);
@@ -209,11 +178,11 @@ public class RootPlotPane extends Pane {
 
         g.setFill(STABLE);
         g.setTextAlign(TextAlignment.LEFT);
-        g.fillText("Left half-plane · stable", 10, 10);
+        g.fillText("Left half-plane (Stable)", 10, 10);
 
         g.setFill(UNSTABLE);
         g.setTextAlign(TextAlignment.RIGHT);
-        g.fillText("Right half-plane · unstable", w - 10, 10);
+        g.fillText("Right half-plane (Unstable)", w - 10, 10);
 
         g.setFill(AXIS);
         g.setTextAlign(TextAlignment.LEFT);
@@ -230,79 +199,11 @@ public class RootPlotPane extends Pane {
             double px = originX + r.getReal() * scale;
             double py = originY - r.getImaginary() * scale;
 
-            if (r == hovered) {
-                g.setStroke(AXIS);
-                g.setLineWidth(1.5);
-                g.strokeOval(px - 11, py - 11, 22, 22);
-                g.setLineWidth(2.5);
-            }
-
             g.setStroke(colorOf(r.getReal()));
             g.strokeLine(px - MARK, py - MARK, px + MARK, py + MARK);
             g.strokeLine(px - MARK, py + MARK, px + MARK, py - MARK);
         }
     }
-
-    //  Hover
-
-    private void onHover(MouseEvent e) {
-        Complex hit = null;
-        double best = HIT_RADIUS;
-
-        for (Complex r : roots) {
-            double dx = originX + r.getReal() * scale - e.getX();
-            double dy = originY - r.getImaginary() * scale - e.getY();
-            double d = Math.hypot(dx, dy);
-            if (d <= best) {
-                best = d;
-                hit = r;
-            }
-        }
-
-        setHovered(hit);
-    }
-
-    private void setHovered(Complex r) {
-        if (r == hovered) return;
-        hovered = r;
-
-        if (r == null) {
-            tip.setVisible(false);
-            draw();
-            return;
-        }
-
-        tip.setText(describe(r));
-        tip.setVisible(true);
-        tip.applyCss();
-        tip.autosize();
-
-        double px = originX + r.getReal() * scale;
-        double py = originY - r.getImaginary() * scale;
-        double x = clamp(px + 12, 2, Math.max(2, getWidth() - tip.getWidth() - 2));
-        double y = py - tip.getHeight() - 10;
-        if (y < 2) y = py + 12;
-        tip.relocate(x, y);
-
-        draw();
-    }
-
-    private static String describe(Complex r) {
-        double re = r.getReal();
-        double im = r.getImaginary();
-
-        String where = re > EPS ? "Right half-plane"
-                     : re < -EPS ? "Left half-plane"
-                     : "Imaginary axis";
-
-        String value = Math.abs(im) < EPS
-                ? num(re)
-                : num(re) + (im < 0 ? " − " : " + ") + num(Math.abs(im)) + "j";
-
-        return "s = " + value + "\n" + where;
-    }
-
-    //  Helpers
 
     private static Color colorOf(double real) {
         if (real > EPS) return UNSTABLE;
@@ -310,7 +211,6 @@ public class RootPlotPane extends Pane {
         return MARGINAL;
     }
 
-    /** Smallest "nice" step (1, 2, 5 x 10^k) close to the wanted one. */
     private static double niceStep(double raw) {
         double exp = Math.floor(Math.log10(raw));
         double base = Math.pow(10, exp);
@@ -324,11 +224,6 @@ public class RootPlotPane extends Pane {
         return String.format(Locale.US, "%." + decimals + "f", v);
     }
 
-    private static String num(double v) {
-        return String.format(Locale.US, "%.4f", Math.abs(v) < EPS ? 0.0 : v);
-    }
-
-    /** +0.5 so 1px lines are crisp. */
     private static double snap(double v) {
         return Math.round(v) + 0.5;
     }
